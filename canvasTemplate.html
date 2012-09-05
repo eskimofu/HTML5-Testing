@@ -1,0 +1,175 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>Box2D Test</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+	<!--<link rel="stylesheet/less" href="less/style.less">
+	<script src="js/libs/less-1.3.0.min.js"></script>
+	
+	 Use SimpLESS (Win/Linux/Mac) or LESS.app (Mac) to compile your .less files
+	to style.css, and replace the 2 lines above by this one:-->
+
+	<link rel="stylesheet" href="less/style.css">
+	 
+
+	<script src="js/libs/modernizr-2.5.3-respond-1.1.0.min.js"></script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+</head>
+<body>
+ 
+    <div class="container">
+
+        <script type="text/javascript">
+
+            var context = undefined;
+            var contextClearColour = "#ffffff";
+            var CONTEXT_WIDTH = 400;
+            var CONTEXT_HEIGHT = 400;
+            var isPlaying = true;
+
+            var mouseX = 0;
+            var mouseY = 0;
+
+            var leftPressed = false;
+            var rightPressed = false;
+            var upPressed = false;
+            var downPressed = false;
+
+
+            $(window).load(function() {
+                try {
+                    preloadAssets();
+                    setupDrawing();
+                    setupControls();
+                    draw();
+                }
+                catch (error) {
+                    console.log("Error: " + error);
+                }
+            });
+
+            // load assets
+            function preloadAssets() {
+
+            }
+
+            // setup controls
+            function setupControls() {
+                $(document).keyup(function(event) {
+                    var key = event.which;
+
+                    if(key == 37) {
+                        leftPressed = false;
+                    }
+                    else if(key == 39) {
+                        rightPressed = false;
+                    }
+                    else if(key == 38) {
+                        upPressed = false;
+                    }
+                    else if(key == 40) {
+                        downPressed = false;
+                    }
+                });
+
+                // pause canvas on click
+                $("#myDrawing").click(function() {
+                    if(isPlaying) {
+                        isPlaying = false;
+                    }
+                    else {
+                        isPlaying = true;
+                    }
+                });
+
+                // keep track of mouse coordinates
+                $(document).mousemove(function(e) {
+                    if(isPlaying) {
+                        mouseX = e.pageX;
+                        mouseY = e.pageY;
+                    }
+                });
+            }
+
+          
+            // setup canvas for drawing
+            function setupDrawing() {
+                var drawingCanvas = document.getElementById('myDrawing');
+
+                if(drawingCanvas) {
+                    // init context
+                    context = drawingCanvas.getContext('2d');
+
+                    // setup draw loop
+                    setInterval(draw, 10);
+                }
+                else {
+                    throw new Error("Error: couldn't initialize context");
+                }
+            }
+
+            // clear canvas before rendering
+            function clearCanvas() {
+                context.fillStyle = contextClearColour;
+                context.fillRect(0,0,CONTEXT_WIDTH,CONTEXT_HEIGHT);
+            }
+
+            // main drawing loop
+            function draw() {
+                if(context) {
+                    clearCanvas();
+                    logicFrame();
+                    drawFrame();
+                }
+                else {
+                    throw new Error("Error: undefined context");
+                }
+            }
+
+            // do frame logic
+            function logicFrame() {
+                // only do logic if frame isn't paused
+                if(isPlaying) {
+
+                }
+            }
+
+            // render the frame
+            function drawFrame() {
+                context.save();
+                context.fillStyle = "#AA0000";
+                context.beginPath();
+                context.fillRect(50,50,100,100);
+                context.closePath();
+                context.fill();
+                context.restore();
+            }
+
+
+        </script>
+
+        <canvas id="myDrawing" width="400" height="400" style="border:3px dashed #999999; margin-top:50px;margin-left:5px;padding:5px;">
+            <p>Displayed when browser doesn't support canvas</p>
+        </canvas>
+
+    </div> <!-- /container -->
+
+
+
+<script src="js/libs/bootstrap/bootstrap.min.js"></script>
+
+
+</body>
+</html>
