@@ -1,0 +1,361 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>Genetic Algorithm 2</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+	<!--<link rel="stylesheet/less" href="less/style.less">
+	<script src="js/libs/less-1.3.0.min.js"></script>
+	
+	 Use SimpLESS (Win/Linux/Mac) or LESS.app (Mac) to compile your .less files
+	to style.css, and replace the 2 lines above by this one:-->
+
+	<link rel="stylesheet" href="less/style.css">
+	 
+
+	<script src="js/libs/modernizr-2.5.3-respond-1.1.0.min.js"></script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+</head>
+<body>
+ 
+    <div class="container">
+
+        <script type="text/javascript">
+
+            var population;
+            var objective = "Hello, world!";
+            var chromosomes = 20;
+
+            $(window).load(function() {
+                setupEskylib("myDrawing", 400, 400, drawFrame, logicFrame, "#ffffff");
+
+                $("#pauseButton").click( function() {
+                    isPlaying = !isPlaying;
+
+                    if(!isPlaying) {
+                        $(this).val("Play");
+                    }
+                    else {
+                        $(this).val("Pause");
+                    }
+                });
+
+                $("#restartButton").click( function() {
+                    population = new Population(objective, chromosomes);
+                    isPlaying = true;
+                    $("#pauseButton").val("Pause");
+                });
+
+                population = new Population(objective, chromosomes);
+            });            
+
+
+            // render the frame
+            function drawFrame() {
+                population.render();
+            }
+
+
+             // do frame logic
+            function logicFrame() {
+                // only do logic if frame isn't paused
+                if(isPlaying) {
+                    if(population.generation()) {
+                        isPlaying = false;
+                    }
+                }
+            }
+
+
+
+
+            /* CHROMOSOME ************************************************/
+            /*
+                Individual components
+            */
+
+
+            // create class
+            var Chromosome = function(code, from) {
+                if(code) {
+                    this.code = code;
+                }
+
+                if(from) {
+                    this.from = from;
+                }
+
+                this.x = 0;
+                this.y = 0;
+                this.cost = 9999;
+                this.colour = "";
+            };
+
+
+
+            Chromosome.prototype.code = '';
+
+
+
+            Chromosome.prototype.random = function(length) {
+                while(length--) {
+                    // generate a random character for length of string
+                    this.code += String.fromCharCode(Math.floor(Math.random() * 55));
+                }
+            }
+
+
+
+            // calculate the function cost between this and the passed chromosome
+            Chromosome.prototype.calcCost = function(compareTo) {
+                var total = 0;
+
+                for(i = 0; i < this.code.length; i++) {
+                    total += (this.code.charCodeAt(i) - compareTo.charCodeAt(i)) *
+                        (this.code.charCodeAt(i) - compareTo.charCodeAt(i));
+                }
+
+                this.cost = total;
+            };
+
+            
+
+            // mate two chromosomes by combining them
+            Chromosome.prototype.mate = function(chromosome) {
+                // pivot point, where to split two children
+                var pivot = Math.round(this.code.length / 2) - 1;
+
+                // split the strings from each child
+                var child1 = this.code.substr(0, pivot) + chromosome.code.substr(pivot);
+                var child2 = chromosome.code.substr(0, pivot) + this.code.substr(pivot);
+
+                var c1 = new Chromosome(child1);
+                var c2 = new Chromosome(child2);
+
+                // create the children
+                return [new Chromosome(child1, "Child of <u>" + this.code + "</u> and <u>" + chromosome.code + "</u>, split at character #" + pivot), new Chromosome(child2, "Child of <u>" + this.code + "</u> and <u>" + chromosome.code + "</u>, split at character #" + pivot)];
+            };
+
+
+
+            // have a chance of mutating (changing a random part)
+            Chromosome.prototype.mutate = function(chance) {
+                // only have a chance to mutate
+                if(Math.random() > chance) {
+                    return;
+                }
+
+                var index = Math.floor(Math.random() * this.code.length);
+                var upOrDown = Math.random() <= 0.5 ? -1 : 1;
+                var newChar = String.fromCharCode(this.code.charCodeAt(index) + upOrDown);
+                var newString = '';
+
+                for (i = 0; i < this.code.length; i++) {
+                    if (i == index) 
+                        newString += newChar;
+                    else 
+                        newString += this.code[i];
+                }
+
+                this.from = "Mutated from <u>" + this.code + "</u>";
+                this.code = newString;
+
+            }
+
+
+
+            // display the Chromosome
+            Chromosome.prototype.display = function() {
+                console.log(this.code);
+            }
+
+
+
+
+            /* POPULATION ************************************************/
+            /*
+                A collection of randomly generated chromosomes
+            */
+
+            // generate a population, defining a goal and the size
+            var Population = function(goal, size) {
+                this.members = [];
+                this.goal = goal;
+                this.generationNumber = 0;
+
+                while(size--) {
+                    var chromosome = new Chromosome();
+                    chromosome.random(this.goal.length);
+                    chromosome.from = "Randomly generated";
+                    this.members.push(chromosome);
+                }
+            };
+
+
+
+            // sort the collection by cost score
+            Population.prototype.sort = function() {
+                this.members.sort(function (a, b) {
+                    return a.cost - b.cost;
+                });
+            };
+
+
+
+            // logic loop 
+            Population.prototype.generation = function () {
+                
+                // calculate the cost for each chromosome
+                for(var i = 0; i < this.members.length; i++) {
+                    this.members[i].calcCost(this.goal);
+                }
+
+                this.sort();
+                
+                // the top two children mate
+                var children = this.members[0].mate(this.members[1]);
+
+                // add the new children
+                this.members.splice(this.members.length  -2, 2, children[0], children[1]);
+
+                var displayString = "<b>Objective: " + objective + "<br />Generation #" + this.generationNumber + ", Chromosomes: " + this.members.length + "</b><br />";
+
+                var highestCost = 0;
+                var highestCostIndex = 0;
+
+
+                // interate through all chromosomes
+                for(var i = 0; i < this.members.length; i++) {
+
+                    // find the member with the highest cost 
+                    if(this.members[i].cost > highestCost) {
+                        highestCost = this.members[i].cost;
+                        highestCostIndex = i;
+                    }
+
+
+
+                    // 50% chance to mutate
+                    this.members[i].mutate(0.5);
+
+                    // generate new cost
+                    this.members[i].calcCost(this.goal);
+
+                    var stringPadding = "";
+                    if(i < 9) {
+                        stringPadding = "&nbsp;";
+                    }
+
+                    displayString += "<br />" + stringPadding + (i+1) + 
+                        ":   <u>" + this.members[i].code + 
+                        "</u> &nbsp;&nbsp;&nbsp;  cost: " + this.members[i].cost + 
+                        " &nbsp;&nbsp;&nbsp;  " + this.members[i].from +
+                        " &nbsp;&nbsp;&nbsp;  colour: #" + this.members[i].colour;
+
+                    // check if this member is a match
+                    if(this.members[i].code == this.goal) {
+                        // ?
+                        //this.sort();
+
+                        displayString += "     <-- Winner!";
+
+                        $("#bestChromosome").html(displayString);
+                        population.render();
+
+                        return true;
+                    }
+                }
+
+                // take the member with the highest cost and replace it with a completely random chromosome
+                if((highestCostIndex >= 0) && (highestCostIndex < this.members.length)) {
+                    //this.members[highestCostIndex].random(this.goal.length);
+                    //this.members[highestCostIndex].calcCost(objective);
+                    //this.members[highestCostIndex].from = "Randomly generated due to highest cost";
+                }
+
+                //this.sort();
+
+                // iterate number, keeps track of how many generations we've had
+                this.generationNumber++;
+
+                $("#bestChromosome").html(displayString);
+            };
+
+
+
+            Population.prototype.render = function () {
+
+                for(var i = 0; i < this.members.length; i++) {
+
+                    var normalizedCost = Math.floor(normalizeRGB(this.members[i].cost));
+                    this.members[i].colour = rgbToHex(normalizedCost,normalizedCost,normalizedCost);
+
+                    var normalizedSize = Math.floor(normalizeSize(this.members[i].cost));
+                    var size = (i * 0.1) * 24;
+
+
+                    if(isPlaying) {
+                        this.members[i].x = Math.floor(Math.random() * CONTEXT_WIDTH);
+                        this.members[i].y = Math.floor(Math.random() * CONTEXT_HEIGHT);
+                    }
+
+                    drawText(this.members[i].code, size + 'px sans-serif', this.members[i].x, this.members[i].y, "#" + this.members[i].colour, 0);
+                }
+            };
+
+
+
+            function rgbToHex(red, green, blue) {
+                var decColor = red + 256 * green + 65536 * blue;
+                return decColor.toString(16);
+            }
+
+
+
+            function normalizeRGB(num) {
+                return num / 255;
+            }
+
+
+
+            function normalizeSize(num) {
+                return num / 24;
+            }
+        </script>
+
+        <input type="button" id="pauseButton" value="Pause" style="height:20px;font-size:10px;padding:3px;margin:3px;"></input>
+        <input type="button" id="restartButton" value="Restart" style="height:20px;font-size:10px;padding:3px;margin:3px;"></input>
+        <input type="text" id="objectiveText" value="Hello, world!" style="height:20px;font-size:10px;padding:3px;margin:3px;"></input>
+        <input type="text" id="chromosomeCount" value="20" style="height:20px;width:50px;font-size:10px;padding:3px;margin:3px;"></input>
+
+        <br /><br /><br />
+
+        <div id="bestChromosome">Loading...</div>
+
+        <br />
+
+        <canvas id="myDrawing" width="400" height="400" style="border:1px solid grey;">
+            <p>Displayed when browser doesn't support canvas</p>
+        </canvas>
+
+    </div> <!-- /container -->
+
+
+
+<script src="js/libs/bootstrap/bootstrap.min.js"></script>
+<script src="js/eskylib.js"></script>
+
+
+</body>
+</html>

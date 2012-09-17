@@ -15,11 +15,17 @@ var isPlaying = true;
 
 var mouseX = 0;
 var mouseY = 0;
+var mouseClicked = false;
 
 var leftPressed = false;
 var rightPressed = false;
 var upPressed = false;
 var downPressed = false;
+
+var LEFT_ARROW = 37;
+var RIGHT_ARROW = 39;
+var UP_ARROW = 38;
+var DOWN_ARROW = 40;
 
 
 
@@ -30,10 +36,9 @@ var downPressed = false;
 
 
 // setup the library
-function setupEskylib(canvasName, w, h, drawFunc, logicFunc) {
+function setupEskylib(canvasName, w, h, drawFunc, logicFunc, clearCol) {
 
 	try {
-
 		if(canvasName) {
 			canvasNameId = canvasName;
 		} else {
@@ -58,6 +63,13 @@ function setupEskylib(canvasName, w, h, drawFunc, logicFunc) {
 		} else {
 			throw "No logic function specified.";
 		}
+
+        if(clearCol) {
+            contextClearColour = clearCol;
+        }
+        else {
+            contextClearColour = "#ffffff";
+        }
 
         setupDrawing();
         setupControls();
@@ -90,13 +102,8 @@ function setupControls() {
     });
 
     // pause canvas on click
-    $(canvasNameId).click(function() {
-        if(isPlaying) {
-            isPlaying = false;
-        }
-        else {
-            isPlaying = true;
-        }
+    $("*").click(function() {
+        mouseClicked = true;
     });
 
     // keep track of mouse coordinates
@@ -142,6 +149,7 @@ function draw() {
         clearCanvas();
         logicLoopFunction();
         drawLoopFunction();
+        mouseClicked = false;
     }
     else {
         throw new Error("Error: undefined context");
@@ -172,7 +180,65 @@ function boundingBoxCollision(obj1, obj2) {
 /*****************************************************************************/
 
 
-function drawPoint(x, y, fill) {}
+
+ /*
+     drawPoint()
+     ******************************************************************
+
+     Draw a point (3px).
+     Assume canvas is already setup.
+     Saves/restores context to avoid interfering with other elements.
+
+     x: x position to draw at, int
+     y: y position to draw at, int
+     fill: fill colour in the format "#ffffff", string
+ */
+function drawPoint(x, y, fill) {
+    context.save();
+    context.translate(x,y);
+
+    context.fillStyle = fill; 
+
+    context.beginPath();
+    context.fillRect(0,0,3,3);
+    context.closePath();
+    context.fill();
+
+    context.restore();
+}
+
+
+
+/*
+    drawLine()
+    ******************************************************************
+
+    Draw a line.
+    Assume canvas is already setup.
+    Saves/restores context to avoid interfering with other elements.
+
+    x1: x position to draw from, int
+    y1: y position to draw from, int
+    x2: x position to draw to, int
+    y2: y position to draw to, int
+    stroke: stroke colour in the format "#ffffff", string
+ */
+function drawLine(x1, y1, x2, y2, stroke) {
+    context.save();
+    context.translate(x1,y1);
+
+    context.strokeStyle = stroke;
+
+    context.beginPath();
+    
+    context.moveTo(0,0);
+    context.lineTo(x2,y2);
+
+    context.closePath();
+    context.stroke();
+
+    context.restore();
+}
 
 
 
@@ -210,19 +276,67 @@ function drawRect(x, y, w, h, fill, stroke, r) {
 }
 
 
-function drawCircle(x, y, rad, fill, stroke) {}
+function drawCircle(x, y, rad, fill, stroke) {
+    context.save();
+    context.translate(x,y);
+
+    if(fill) { context.fillStyle = fill; }
+    if(stroke) { context.strokeStyle = stroke; }
+
+    context.beginPath();
+
+    context.arc(x,y,rad,0,Math.PI*2,true);
+
+    context.closePath();
+    context.fill();
+
+    context.restore();
+}
 
 
 function loadImg(url) {
-	var image = undefined;
+	var image = new Image();
+
+    if(!url) {
+        throw "Couldn't load image: " + url;
+    }
+
+    image.url = url;
 
 	return image;
 }
 
 
-function drawImg(x, y, image, r) {
+function drawImg(x, y, image, w, h, r) {
 	context.save();
 	context.translate(x,y);
 
+    if(r) { context.rotate(r); }
+
+    if(!image) {
+        throw "Trying to draw invalid image.";
+    } else {
+        context.drawImage(image,x,y,w,h);
+    }
+
 	context.restore();
+}
+
+
+function drawText(text, font, x, y, fill, stroke) {
+    context.save();
+    context.translate(x,y);
+
+    if(fill) { context.fillStyle = fill; }
+    if(stroke) { context.strokeStyle = stroke; }
+
+    if(font) { context.font = font; } 
+    else     { context.font = '12px sans-serif'; }
+
+    context.textBaseline = 'top';
+
+    if(fill) { context.fillText(text,0,0); }
+    if(stroke) { context.strokeText(text,0,0); }
+
+    context.restore();
 }

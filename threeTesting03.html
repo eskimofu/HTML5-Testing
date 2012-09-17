@@ -1,0 +1,272 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>threeTesting03</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+    <script src="js/three.min.js"></script>
+    <script src="js/eskylibTHREE.js"></script>
+
+</head>
+
+<body style="background:#000000;">
+ 
+    <div class="container">
+
+        <div id="viewport-container"></div>
+
+        <script type="text/javascript">
+
+            var sphere, pointLight1, pointLight2;
+            var bgPlane, fgPlane, bgPlane2;
+            var scaleUp = true;
+            var particleSystem;
+
+
+
+            $(document).ready(function() {
+                setupEskylib("#viewport-container", 800, 600, drawFrame, logicFrame, 0x000000);
+                setupScene();
+            });            
+
+
+
+            // setup the scene
+            function setupScene() {
+                // BG2
+                var w2 = 800, 
+                    h2 = 600, 
+                    segmentsW2 = 1, 
+                    segmentsH2 = 1;
+                
+
+                // setup geometry, material
+                var planeGeometry2 = new THREE.PlaneGeometry ( w2, h2, segmentsW2, segmentsH2 ),
+                    planeMaterial2 = new THREE.MeshLambertMaterial ( 
+                        {   //color: 0xBA6D6C,
+                            map: THREE.ImageUtils.loadTexture( "img/bg2.jpg" ),
+                            blending: THREE.AdditiveBlending, 
+                            transparent: true
+                        } );
+
+                // combine into a mesh
+                bgPlane2 = new THREE.Mesh(planeGeometry2, planeMaterial2);
+
+                bgPlane2.position.z = -400;
+
+                // add the mesh to the scene
+                scene.add(bgPlane2);
+
+
+                // BG
+                var w = 800, 
+                    h = 600, 
+                    segmentsW = 1, 
+                    segmentsH = 1;
+                
+
+                // setup geometry, material
+                var planeGeometry = new THREE.PlaneGeometry ( w, h, segmentsW, segmentsH ),
+                    planeMaterial = new THREE.MeshLambertMaterial ( 
+                        {   //color: 0xBA6D6C,
+                            map: THREE.ImageUtils.loadTexture( "img/bg.jpg" ),
+                            blending: THREE.AdditiveBlending, 
+                            transparent: true
+                        } );
+
+                // combine into a mesh
+                bgPlane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+                bgPlane.position.x = 0;
+                bgPlane.position.z = -100;
+                bgPlane.position.y = -50;
+
+                // add the mesh to the scene
+                scene.add(bgPlane);
+
+
+                // SPHERE
+
+                // setup sphere variables
+                var radius = 70,
+                    segments = 64,
+                    rings = 64;
+
+                // setup geometry, material
+                var sphereGeometry = new THREE.SphereGeometry ( radius, segments, rings ),
+                    sphereMaterial = new THREE.MeshLambertMaterial ( 
+                        {   //color: 0xBA6D6C,
+                            map: THREE.ImageUtils.loadTexture( "img/mars-hi.png" )
+                        } );
+
+                // combine into a mesh
+                sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+                //sphere.alpha = 0.3;
+
+                // add the mesh to the scene
+                scene.add(sphere);
+
+
+                // LIGHT1
+
+                // create a point light
+                pointLight1 = new THREE.PointLight(0xfcfbf1);
+
+                // position it
+                pointLight1.position.x = 70;
+                pointLight1.position.y = 50;
+                pointLight1.position.z = 130;
+
+                pointLight1.intensity = 1;
+
+                // to sene
+                scene.add(pointLight1);
+
+
+                // LIGHT2
+
+                // create a point light
+                pointLight2 = new THREE.PointLight(0xf2f1fc);
+
+                // position it
+                pointLight2.position.x = -90;
+                pointLight2.position.y = -80;
+                pointLight2.position.z = 130;
+
+                pointLight2.intensity = 0.4;
+
+                // to sene
+                scene.add(pointLight2);
+
+
+                // PARTICLES
+
+                // create particle vars
+                var particleCount = 1100,
+                    particles = new THREE.Geometry(),      // particles are basically a list of verts
+                    pMaterial = new THREE.ParticleBasicMaterial ({
+                        color: 0xFFFFFF,
+                        size: 5,
+
+                        // without setting up a texture, particles will be coloured squares
+                        map: THREE.ImageUtils.loadTexture( "img/particle.png" ), // load a texture
+                        blending: THREE.AdditiveBlending, // additive blending ignores black backgrounds
+                        transparent: true
+                    });
+
+                // for each particle
+                for(var p = 0; p < particleCount; p++) {
+                    // random position
+                    var pX = Math.random() * 500 - 250,
+                        pY = Math.random() * 500 - 250,
+                        pZ = Math.random() * 500 - 250;
+
+                    // combine into single vertex
+                    var particle =  new THREE.Vector3(pX, pY, pZ) ;
+
+                    // add to particles list
+                    particles.vertices.push(particle);
+                }
+
+                // create the particle system
+                particleSystem = new THREE.ParticleSystem ( particles, pMaterial );
+
+                // allow particles to be sorted
+                particleSystem.sortParticles = true;
+
+                // add to scene
+                scene.add(particleSystem);
+
+
+
+                // FG
+                var fw = 800, 
+                    fh = 600, 
+                    fsegmentsW = 1, 
+                    fsegmentsH = 1;
+                
+
+                // setup geometry, material
+                var fplaneGeometry = new THREE.PlaneGeometry ( fw, fh, fsegmentsW, fsegmentsH ),
+                    fplaneMaterial = new THREE.MeshLambertMaterial ( 
+                        {   //color: 0xBA6D6C,
+                            map: THREE.ImageUtils.loadTexture( "img/foreground.jpg" ),
+                            blending: THREE.AdditiveBlending, 
+                            transparent: true
+                        } );
+
+                // combine into a mesh
+                fgPlane = new THREE.Mesh(fplaneGeometry, fplaneMaterial);
+
+                fgPlane.position.z = -75;
+
+                // add the mesh to the scene
+                scene.add(fgPlane);
+            }
+
+
+
+            // render the frame
+            function drawFrame() {
+                // start drawing
+                renderer.render(scene, camera);
+            }
+
+
+
+             // do frame logic
+            function logicFrame() {
+                // only do logic if frame isn't paused
+                if(isPlaying) {
+                    sphere.rotation.x += 0.00015;
+                    sphere.rotation.y += 0.0003;
+                    sphere.rotation.z += 0.0005;
+
+                    /*if(scaleUp) {
+                        sphere.scale.x += 0.01;
+                        sphere.scale.y += 0.01;
+                        sphere.scale.z += 0.01;
+
+                        if(sphere.scale.x >= 2) {
+                            scaleUp = false;
+                        }
+                    }
+                    else {
+                        sphere.scale.x -= 0.01;
+                        sphere.scale.y -= 0.01;
+                        sphere.scale.z -= 0.01;
+
+                        if(sphere.scale.x <= 0.5) {
+                            scaleUp = true;
+                        }
+                    }*/
+
+                    particleSystem.rotation.y += 0.0001;
+
+                    bgPlane.rotation.z += 0.00011;
+                }
+            }
+
+        </script>
+
+        
+
+
+    </div> <!-- /container -->
+
+</body>
+</html>

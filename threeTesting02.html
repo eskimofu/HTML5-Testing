@@ -1,0 +1,126 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>threeTesting02</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+    <script src="js/three.min.js"></script>
+    <script src="js/eskylibTHREE.js"></script>
+
+</head>
+
+<body>
+ 
+    <div class="container">
+
+        <div id="viewport-container"></div>
+
+        <script type="text/javascript">
+
+            var sphere, pointLight;
+            var scaleUp = true;
+
+
+
+            $(document).ready(function() {
+                setupEskylib("#viewport-container", 400, 300, drawFrame, logicFrame, "#ffffff");
+                setupScene();
+            });            
+
+
+
+            // setup the scene
+            function setupScene() {
+                // SPHERE
+
+                // setup sphere variables
+                var radius = 50,
+                    segments = 16,
+                    rings = 16;
+
+                // setup geometry, material
+                var sphereGeometry = new THREE.SphereGeometry ( radius, segments, rings ),
+                    sphereMaterial = new THREE.MeshLambertMaterial ( { color: 0xCC0000 } );
+
+                // combine into a mesh
+                sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+                // add the mesh to the scene
+                scene.add(sphere);
+
+
+                // LIGHT
+
+                // create a point light
+                pointLight = new THREE.PointLight(0xFFFFFF);
+
+                // position it
+                pointLight.position.x = 10;
+                pointLight.position.y = 50;
+                pointLight.position.z = 130;
+
+                // to sene
+                scene.add(pointLight);
+            }
+
+
+
+            // render the frame
+            function drawFrame() {
+                // start drawing
+                renderer.render(scene, camera);
+            }
+
+
+
+             // do frame logic
+            function logicFrame() {
+                // only do logic if frame isn't paused
+                if(isPlaying) {
+                    sphere.rotation.x += 0.01;
+                    sphere.rotation.y += 0.01;
+                    sphere.rotation.z += 0.01;
+
+                    if(scaleUp) {
+                        sphere.scale.x += 0.01;
+                        sphere.scale.y += 0.01;
+                        sphere.scale.z += 0.01;
+
+                        if(sphere.scale.x >= 2) {
+                            scaleUp = false;
+                        }
+                    }
+                    else {
+                        sphere.scale.x -= 0.01;
+                        sphere.scale.y -= 0.01;
+                        sphere.scale.z -= 0.01;
+
+                        if(sphere.scale.x <= 0.5) {
+                            scaleUp = true;
+                        }
+                    }
+                }
+            }
+
+        </script>
+
+        
+
+
+    </div> <!-- /container -->
+
+</body>
+</html>

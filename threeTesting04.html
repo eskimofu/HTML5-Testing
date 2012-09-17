@@ -1,0 +1,179 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>threeTesting03</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+    <script src="js/three.min.js"></script>
+    <script src="js/eskylibTHREE.js"></script>
+    <script src="js/minecraftMap.js"></script>
+
+</head>
+
+<body style="background:#000000;">
+ 
+    <div class="container">
+
+        <div id="viewport-container"></div>
+
+        <script type="text/javascript">
+
+            var sphere, pointLight1, pointLight2;
+            var map, MAP_SIZE = 50, CUBE_SIZE = 10;
+            var controls;
+
+
+            $(document).ready(function() {
+                setupEskylib("#viewport-container", 800, 600, drawFrame, logicFrame, 0x000000);
+                setupScene();
+            });            
+
+
+
+            // setup the scene
+            function setupScene() {
+
+                // MAP
+
+                map = new MinecraftMap(MAP_SIZE, CUBE_SIZE);
+
+                map.each( function(i,j,k,value) {
+                    
+                    if(value == 1) {
+                        // setup sphere variables
+                        var box,
+                            boxW = CUBE_SIZE,
+                            boxH = CUBE_SIZE,
+                            boxD = CUBE_SIZE,
+                            boxSegW = 1,
+                            boxSegH = 1,
+                            boxSegD = 1,
+                            materials,
+                            sides = 4;
+
+                        // setup geometry, material
+                       var cubeGeometry = new THREE.CubeGeometry ( boxW, boxH, boxD,
+                                                                    boxSegW, boxSegH, boxSegD,
+                                                                    materials, sides ),
+                            cubeMaterial = new THREE.MeshLambertMaterial ( 
+                                {   color: 0xBA6D6C,
+                                    //map: THREE.ImageUtils.loadTexture( "img/mars-hi.png" )
+                                } );
+ 
+                        // combine into a mesh
+                        box = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+                        box.position.x = i * CUBE_SIZE;
+                        box.position.y = j * CUBE_SIZE;
+                        box.position.z = k * CUBE_SIZE;
+
+                        // add the mesh to the scene
+                        scene.add(box);
+                    }
+                });
+
+               
+
+                // LIGHT1
+
+                // create a point light
+                pointLight1 = new THREE.PointLight(0xFFFFFF);
+
+                // position it
+                pointLight1.position.x = 70;
+                pointLight1.position.y = 50;
+                pointLight1.position.z = 130;
+
+                pointLight1.intensity = 0.9;
+
+                // to sene
+                scene.add(pointLight1);
+
+                
+
+                // LIGHT2
+
+                // create a point light
+                pointLight2 = new THREE.PointLight(0xFFFFFF);
+
+                // position it
+                pointLight2.position.x = -90;
+                pointLight2.position.y = -80;
+                pointLight2.position.z = 230;
+
+                pointLight2.intensity = 0.2;
+
+                // to sene
+                scene.add(pointLight2);
+
+
+
+
+                // CAMERA 
+
+                camera.position.x = 100;
+                camera.position.y = 100;
+
+
+
+                // CONTROLS
+
+                controls = new THREE.FirstPersonControls(camera);
+
+                controls.movementSpeed = 5;
+                controls.lookSpeed = 0.005;
+                controls.noFly = false;
+                controls.lookVertical = true;
+                controls.activeLook = false;
+
+                if(controls == undefined) {
+                    console.log("Controls error!!");
+                }
+            }
+
+
+
+            // render the frame
+            function drawFrame() {
+                // start drawing
+                controls.update(1);
+                renderer.render(scene, camera);
+            }
+
+
+
+             // do frame logic
+            function logicFrame() {
+                // only do logic if frame isn't paused
+                if(isPlaying) {
+                    if(mouseClicked) {
+                        controls.activeLook = true;
+                    } 
+                    else {
+                        controls.activeLook = false;
+                    }
+                }
+            }
+
+        </script>
+
+        
+
+
+    </div> <!-- /container -->
+
+</body>
+</html>
