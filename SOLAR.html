@@ -1,0 +1,538 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>SOLAR</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+    <script src="js/three.r51.min.js"></script>
+    <script src="js/eskylibTHREE_V02.js"></script>
+    <script src="js/SOLAR.js"></script>
+    <script src="js/skybox.js"></script>
+
+</head>
+
+<body style="background:#313131;">
+ 
+    <div class="container">
+
+        <div id="viewport-container"></div>
+
+        <script type="text/javascript">
+
+            var skyBox;
+            var solarSystem;
+            var controls;
+
+            // initialize object to perform world/screen calculations
+            var projector;
+
+
+            $(document).ready(function() {
+                setupEskylib("#viewport-container", 800, 600, drawFrame, logicFrame, 0x000000);
+                setupScene();
+                startDrawing();
+            });            
+
+
+
+            // setup the scene
+            function setupScene() {
+
+                projector = new THREE.Projector();
+
+
+
+
+
+
+                // CONTROLS
+
+                controls = new THREE.FirstPersonControls(camera);
+
+                controls.movementSpeed = 10;
+                controls.lookSpeed = 0.005;
+                controls.noFly = false;
+                controls.lookVertical = true;
+                controls.activeLook = false;
+
+                if(controls == undefined) {
+                    console.log("Controls error!!");
+                }
+
+
+
+                // AMBIENT LIGHT
+
+                var ambientLight = new THREE.AmbientLight(0x222222);
+                scene.add(ambientLight);
+
+
+
+                // SKYBOX
+
+                skyBox = new Skybox (0.000001, 0.000001, 0.000001,                 // rotation / frame
+                                         10000,                          // scale
+                                         "img/space_right1.jpg",        // image set
+                                         "img/space_left2.jpg",
+                                         "img/space_top3.jpg",
+                                         "img/space_bottom4.jpg",
+                                         "img/space_front5.jpg",
+                                         "img/space_back6.jpg",
+                                         scene  );
+
+
+
+                // SOLAR SYSTEM
+
+                solarSystem = new SolarSystem(scene);
+
+
+
+
+                // particle systems
+                solarSystem.addParticleSystem(new ParticleSystem(0, 0, 0,           // position
+                                                                 0.000075, 0.000075, 0.000075,     // rotation / frame
+                                                                 600,               // particle count
+                                                                 "STATIC_BOX",            // system type
+                                                                 10,                // particle size
+                                                                 3000,              // range
+                                                                 1,
+                                                                 0xffffff,
+                                                                 "img/particle_transparent.png" // texture
+                                                                ));
+
+                solarSystem.addParticleSystem(new ParticleSystem(0, 0, 0,
+                                                                 0.000025, 0.000025, 0.000025,
+                                                                 1200,
+                                                                 "STATIC_BOX",
+                                                                 5,
+                                                                 3000,              // range
+                                                                 1,
+                                                                 0xffffff,
+                                                                 "img/particle_transparent.png"
+                                                                ));
+
+
+
+// dorothy
+/*
+solarSystem.addParticleSystem(new ParticleSystem(200, 0, 0,
+                                                                 0.00, 0.000, 0.000,
+                                                                 200,
+                                                                 "STATIC_SPHERE",
+                                                                 20,
+                                                                 50,              // range
+                                                                 1,
+                                                                 0xff00ff,
+                                                                 "img/particle_transparent.png"
+                                                                ));
+
+solarSystem.addParticleSystem(new ParticleSystem(200, 0, 0,
+                                                                 0.00, 0.000, 0.000,
+                                                                 200,
+                                                                 "STATIC_SPHERE",
+                                                                 15,
+                                                                 40,              // range
+                                                                 1,
+                                                                 0xdd00dd,
+                                                                 "img/particle_transparent.png"
+                                                                ));
+
+solarSystem.addParticleSystem(new ParticleSystem(200, 0, 0,
+                                                                 0.00, 0.000, 0.000,
+                                                                 200,
+                                                                 "STATIC_SPHERE",
+                                                                 10,
+                                                                 30,              // range
+                                                                 1,
+                                                                 0xbb00bb,
+                                                                 "img/particle_transparent.png"
+                                                                ));       
+*/
+               /* solarSystem.addParticleSystem(new ParticleSystem(0, 0, 0,
+                                                                 0.000005, 0.000005, 0.000005,
+                                                                 1000,
+                                                                 "STATIC_BOX",
+                                                                 500,
+                                                                 1000,              // range
+                                                                 0.35,
+                                                                 0x0c266a,
+                                                                 "img/particle_transparent.png"
+                                                                ));*/
+
+
+
+/*
+
+
+
+*/
+
+
+                // sun
+                var sun = solarSystem.addPlanet(new Planet("The Sun",     // name
+                                                 0, 0, 0,       // initial position
+                                                 0.0005, 0.0005, 0.0005,       // rotation / frame
+                                                 0, 0, 0,       // movement / frame
+                                                 1,             // scale factor
+                                                 "img/sun.jpg",     // surface texture
+                                                 "img/sun.jpg", // atmosphere texture
+                                                 "BASIC",           // texture style
+                                                 2,            // atmosphere rotation factor
+                                                 0.2,            // alpha of atmosphere
+                                                 0xffffff,      // light colour
+                                                 1,            // light intensity
+                                                 "img/mars.jpg"   // corona
+                                                ));
+
+                sun.addChildParticleSystem(new ParticleSystem(0, 0, 0,           // position
+                                                         0.001, 0.001, 0.001,     // rotation / frame
+                                                         250,               // particle count
+                                                         "STATIC_SPHERE",            // system type
+                                                         300,                // particle size
+                                                         105,              // range
+                                                         0.25,
+                                                         0xf1ce49,
+                                                         "img/particle_transparent.png" // texture
+                                                        ), 
+                                                        scene);
+
+
+                // mercury
+                var mercury = solarSystem.addPlanet(new Planet(
+                    "Mercury",                  // name
+                    -200, 0, 0,                 // initial position
+                    0.0002, 0.0002, 0.0002,     // rotation / frame
+                    0, 0, 0,                    // movement / frame
+                    0.05,                       // scale factor
+                    "img/mercury.jpg",            // surface texture
+                    "",                         // atmosphere texture
+                    "LAMBERT",                  // texture style
+                    0,                        // atmosphere rotation factor
+                    0,                        // alpha of atmosphere
+                    0xffffff,                   // light colour
+                    0                           // light intensity
+                ));
+
+
+                // venus
+                var venus = solarSystem.addPlanet(new Planet(
+                    "Venus",                    // name
+                    -400, 0, 0,                 // initial position
+                    0.0002, 0.0002, 0.0002,     // rotation / frame
+                    0, 0, 0,                    // movement / frame
+                    0.12,                       // scale factor
+                    "img/venus.jpg",            // surface texture
+                    "",         // atmosphere texture
+                    "LAMBERT",                  // texture style
+                    0,                        // atmosphere rotation factor
+                    0,                        // alpha of atmosphere
+                    0xffffff,                   // light colour
+                    0                           // light intensity
+                ));
+
+
+                // earth
+                var earth = solarSystem.addPlanet(new Planet(
+                    "Earth",                    // name
+                    -600, 0, 0,                 // initial position
+                    0.0002, 0.0002, 0.0002,     // rotation / frame
+                    0, 0, 0,                    // movement / frame
+                    0.14,                        // scale factor
+                    "img/earth.jpg",            // surface texture
+                    "img/clouds-earth.jpg",         // atmosphere texture
+                    "LAMBERT",                  // texture style
+                    1.5,                        // atmosphere rotation factor
+                    0.2,                        // alpha of atmosphere
+                    0xffffff,                   // light colour
+                    0                           // light intensity
+                ));
+
+                    // Moon
+                    earth.addChildPlanet(new Planet(
+                        "Moon",                     // name
+                        -600, 0, 60,                 // initial position
+                        0.0005, 0.0005, 0.0005,     // rotation / frame
+                        0, 0, 0,                    // movement / frame
+                        0.06,                       // scale factor
+                        "img/moon.jpg",          // surface texture
+                        "",        // atmosphere texture
+                        "LAMBERT",                  // texture style
+                        0,                          // atmosphere rotation factor
+                        0,                        // alpha of atmosphere
+                        0xffffff,                   // light colour
+                        0                           // light intensity
+                        ), scene );
+
+
+                // mars
+                var mars = solarSystem.addPlanet(new Planet(
+                    "Mars",                     // name
+                    -800, 0, 0,                 // initial position
+                    0.0005, 0.0005, 0.0005,     // rotation / frame
+                    0, 0, 0,                    // movement / frame
+                    0.07,                       // scale factor
+                    "img/mars.jpg",          // surface texture
+                    "",                     // atmosphere texture
+                    "LAMBERT",                  // texture style
+                    0,                          // atmosphere rotation factor
+                    0,                        // alpha of atmosphere
+                    0xffffff,                   // light colour
+                    0                           // light intensity
+                ));
+
+                    // Phobos
+                    mars.addChildPlanet(new Planet(
+                        "Phobos",                     // name
+                        -800, 0, 60,                 // initial position
+                        0.0005, 0.0005, 0.0005,     // rotation / frame
+                        0, 0, 0,                    // movement / frame
+                        0.03,                       // scale factor
+                        "img/mars.jpg",          // surface texture
+                        "",                         // atmosphere texture
+                        "LAMBERT",                  // texture style
+                        0,                          // atmosphere rotation factor
+                        0,                        // alpha of atmosphere
+                        0xffffff,                   // light colour
+                        0                           // light intensity
+                        ), scene );
+
+                    // Demos
+                    /*mars.addChildPlanet(new Planet(
+                        "Demos",                     // name
+                        -800, 0, 200,                 // initial position
+                        0.0005, 0.0005, 0.0005,     // rotation / frame
+                        0, 0, 0,                    // movement / frame
+                        0.03,                       // scale factor
+                        "img/mars-hi.png",          // surface texture
+                        "img/clouds-hi.png",        // atmosphere texture
+                        "LAMBERT",                  // texture style
+                        2,                          // atmosphere rotation factor
+                        0.5,                        // alpha of atmosphere
+                        0xffffff,                   // light colour
+                        0                           // light intensity
+                        ), scene );
+*/
+
+
+                // jupiter
+                var jupiter = solarSystem.addPlanet(new Planet(
+                    "Jupiter",                  // name
+                    -1600, 0, 0,                // initial position
+                    0.0015, 0.0015, 0.0015,     // rotation / frame
+                    0, 0, 0,                    // movement / frame
+                    0.58,                       // scale factor
+                    "img/jupiter.jpg",          // surface texture
+                    "",        // atmosphere texture
+                    "LAMBERT",                  // texture style
+                    0,                          // atmosphere rotation factor
+                    0,                        // alpha of atmosphere
+                    0xffffff,                   // light colour
+                    0                           // light intensity
+                ));
+
+
+                // saturn
+                var saturn = solarSystem.addPlanet(new Planet(
+                    "Saturn",                   // name
+                    -2200, 0, 0,                // initial position
+                    0.0002, 0.0002, 0.0002,     // rotation / frame
+                    0, 0, 0,                    // movement / frame
+                    0.40,                       // scale factor
+                    "img/saturn.jpg",          // surface texture
+                    "",                         // atmosphere texture
+                    "LAMBERT",                  // texture style
+                    0,                          // atmosphere rotation factor
+                    0,                          // alpha of atmosphere
+                    0xffffff,                   // light colour
+                    0                           // light intensity
+                ));
+
+
+                // uranus
+                var uranus = solarSystem.addPlanet(new Planet(
+                    "Uranus",                   // name
+                    -2800, 0, 0,                // initial position
+                    0.0001, 0.0001, 0.0001,     // rotation / frame
+                    0, 0, 0,                    // movement / frame
+                    0.31,                       // scale factor
+                    "img/uranus.jpg",          // surface texture
+                    "",        // atmosphere texture
+                    "LAMBERT",                  // texture style
+                    0,                          // atmosphere rotation factor
+                    0,                          // alpha of atmosphere
+                    0xffffff,                   // light colour
+                    0                           // light intensity
+                ));
+
+
+                // neptune
+                var neptune = solarSystem.addPlanet(new Planet(
+                    "Neptune",                  // name
+                    -3200, 0, 0,                // initial position
+                    0.0001, 0.0001, 0.0001,     // rotation / frame
+                    0, 0, 0,                    // movement / frame
+                    0.29,                       // scale factor
+                    "img/neptune.jpg",          // surface texture
+                    "",        // atmosphere texture
+                    "LAMBERT",                  // texture style
+                    0,                          // atmosphere rotation factor
+                    0,                          // alpha of atmosphere
+                    0xffffff,                   // light colour
+                    0                           // light intensity
+                ));
+
+
+                // pluto
+                var pluto = solarSystem.addPlanet(new Planet(
+                    "Pluto",                    // name
+                    -3800, 0, 0,                // initial position
+                    0.0001, 0.0001, 0.0001,     // rotation / frame
+                    0, 0, 0,                    // movement / frame
+                    0.05,                       // scale factor
+                    "img/uranus.jpg",          // surface texture
+                    "img/clouds.jpg",        // atmosphere texture
+                    "LAMBERT",                  // texture style
+                    1,                          // atmosphere rotation factor
+                    0.9,                          // alpha of atmosphere
+                    0xffffff,                   // light colour
+                    0                           // light intensity
+                ));
+
+
+                 // CAMERA 
+
+                camera.position.x = 737.4383274056612;//-150;//0;
+                camera.position.y = 228.49576933313637;//100;
+                camera.position.z = 1001.4845437458404;//50;//300;
+
+                camera.rotation.x = -0.1469097717886605;
+                camera.rotation.y = 0.9695147527500158;
+                camera.rotation.z = 0.12142231379323125;
+
+                // WHY U NO WORK
+                //camera.lookAt(sun.surfaceMesh.position);
+
+            }
+
+
+
+            // render the frame
+            function drawFrame() {
+                controls.update(0.2);
+                renderer.render(scene, camera);
+
+                doPicking();
+            }
+
+
+
+             // do frame logic
+            function logicFrame() {
+                if(isPlaying) {
+                    //
+                    solarSystem.update();
+                    skyBox.update();
+
+                    if(mouseClicked) {
+                        controls.activeLook = true;
+                    } 
+                    else {
+                        controls.activeLook = false;
+                    }
+
+                    //$("#cameraPos").val(camera.position.x + " " + camera.position.y + " " + camera.position.z);
+                    //$("#cameraLookAt").val(camera.rotation.x + " " + camera.rotation.y + " " + camera.rotation.z);
+                }         
+            }
+
+
+
+var currentHoverObject;
+
+            // find objects in the scene the mouse is currently over
+            function doPicking() {
+
+                var screenX = (mouseX / WIDTH) * 2 - 1;
+                var screenY = (mouseY / HEIGHT) * 2 + 1;
+
+                //console.log(screenX, screenY);
+
+                // create a ray from the mouse position into the scene
+
+                // position isn't right
+                var vector = new THREE.Vector3(camera.position.x + mouseX, camera.position.y + mouseY, camera.position.z + 1);
+
+                // is projector working?
+                projector.unprojectVector(vector, camera);
+
+                var ray = new THREE.Ray (camera.position, vector.subSelf (camera.position).normalize() );
+
+                // create an array with all objects the ray hits
+                var intersects = ray.intersectObjects (scene.children );
+
+                //console.log(intersects.length);
+
+                if(intersects.length > 0) {
+                    //console.log(intersects);
+
+                    if(currentHoverObject !== intersects[0].object) {
+
+                        if(currentHoverObject) {
+                            // reset
+                        }
+
+                        currentHoverObject = intersects[0].object;
+                    }
+
+
+                    if(currentHoverObject.material) {
+                        //console.log(currentHoverObject);
+                        //currentHoverObject.material.color.setHex( 0xff0000 );
+
+                    }
+
+
+                    if(currentHoverObject.name !== "") {
+                        //console.log(currentHoverObject.name);
+                    }
+
+                    
+                }
+
+
+                for(var p = 0; p < intersects.length; p++ ) {
+                    if((intersects[p].name) && (intersects[p].name !== "")) {
+                        //console.log(currentHoverObject.name);
+                    }
+                }
+            }
+
+
+        </script>
+
+        <br /><br />
+
+        <span style="color:#fff;font-family:sans-serif";>Left click and move mouse to look around.<br />Use arrow keys to move.<br />Don't get too close to sun plz.</span>
+        
+        <!--<span style="color:#fff;">Position:&nbsp;&nbsp;&nbsp;&nbsp;</span> <input id="cameraPos" value="0 0 0" style="width:500px;" /> <br />
+        <span style="color:#fff;">Looking at:</span> <input id="cameraLookAt" value="0 0 0" style="width:500px;" /> -->
+
+
+    </div> <!-- /container -->
+
+</body>
+</html>
