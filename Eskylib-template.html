@@ -1,0 +1,70 @@
+<!doctype html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>Eskylib-template</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+    <script src="js/three.r51.min.js"></script>
+    <script src="js/Eskylib-0.3.js"></script>
+
+</head>
+
+<body style="background:#111111;">
+ 
+    <div class="container">
+
+        <div id="viewport-container"></div>
+
+        <script type="text/javascript">
+
+            var eskyLib;
+
+            $(document).ready(function() {
+                eskyLib = new EskyLib({
+                    container: "#viewport-container", 
+                    width: 800, 
+                    height: 600, 
+                    setupFunction: setupScene,
+                    drawLoopFunction: drawFrame, 
+                    logicLoopFunction: logicFrame, 
+                    clearColour: 0xFFFFFF,
+                    ambientLightColour: 0xFFFFFF
+                );
+
+                eskyLib.startDrawing();
+            });            
+
+
+            // setup the scene
+            function setupScene() {
+                
+            }
+
+
+            // render the frame
+            function drawFrame() {
+                
+            }
+
+
+             // do frame logic
+            function logicFrame() {
+                if(isPlaying) {
+                    
+                }
+            }
+
+        </script>
+
+    </div> <!-- /container -->
+
+</body>
+</html>
