@@ -239,6 +239,6 @@ console.log(this);
         throw new Error("Error: undefined context");
     }*/
 
-    this.requestFrame(this.draw);
+    this.requestFrame(this.draw); 
 }
 
