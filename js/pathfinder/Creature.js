@@ -1,6 +1,6 @@
 // base class for all creatures
 var Creature = function( arguments ) {
-    this.name = (arguments.name ? arguments.name : "New Creature");
+    this.name = arguments.name;
 
     this.race = arguments.race;
     this.class = arguments.class;	// is this a protected var?
@@ -8,6 +8,7 @@ var Creature = function( arguments ) {
     this.age = arguments.age;
     this.gender = arguments.gender;
     this.alignment = arguments.alignment;
+    this.size = 0; // taken from race, but can be overwritten
     this.weight = arguments.weight;
     this.backgroundInformation = arguments.backgroundInformation;	// string with background flavour text
     this.mood = arguments.mood;
@@ -18,12 +19,12 @@ var Creature = function( arguments ) {
     this.experiencePoints = arguments.experiencePoints;
     this.nextLevelExperiencePoints = arguments.nextLevelExperiencePoints;
 
-    this.hitDice = new HitDice(arguments.hitDice); // represent as a map? how to show 1d4, 2d8, etc
+    this.hitDice = new Dice(arguments.hitDice); // represent as a map? how to show 1d4, 2d8, etc
 
     this.baseAttributes = arguments.baseAttributes;
-    this.modifiedAttributes = 0;
+    this.attributes = arguments.baseAttributes;
 
-    this.equipedItems = ["head": "",
+    this.equipedItems = {"head": "",
     					 "face": "",
     					 "throat": "",
     					 "shoulders": "",
@@ -34,13 +35,8 @@ var Creature = function( arguments ) {
     					 "ringLeft": "",
     					 "ringRight": "",
     					 "waist": "",
-    					 "feet": "" ];
+    					 "feet": "" }; // write custom item slots instead of hard coding
     this.bags = []; 
-
-    this.moneyPlatinum = 0;
-    this.moneyGold = 0;
-    this.moneySilver = 0;
-    this.moneyCopper = 0;
 
     this.hunger = 0;
     this.thirst = 0;
@@ -86,8 +82,8 @@ Creature.prototype.pickupItem = function(item, bag) {};
 Creature.prototype.dropItem = function(item, bag) {};
 Creature.prototype.destroyItem = function(item, bag) {};
 
-Creature.prototype.equipPickedUpItem = function(item, bag) {};
-Creature.prototype.unequipPickedUpItem = function(item) {};
+Creature.prototype.equipPickedUpItem = function(item, bag) {}; 
+Creature.prototype.unequipPickedUpItem = function(item, bag) {};
 
 Creature.prototype.attackMelee = function(targetCreature) {};
 Creature.prototype.attackRanged = function(targetCreature) {};
@@ -96,18 +92,33 @@ Creature.prototype.usePower = function(powerName, target) {};
 Creature.prototype.useItem = function(itemName, target) {};
 
 // give the creature experience points, and if it hits the next level amount level the creature up and reset counter
-Creature.prototype.giveExperience = function(amount) {
-	this.experiencePoints += amount;
+Creature.prototype.modify = function(attribute, action, amount) {
 
-	if(this.experiencePoints >= this.nextLevelExperiencePoints) {
+    // validate it's a property
+   /* if(this[attribute]) {
 
-		this.levelUp();
-	}
+
+        // use a generic modify function to make the change
+
+        this[attribute] += amount;
+
+        switch(attribute) {
+
+            case "experiencePoints": {
+            	this.experiencePoints += amount;
+
+            	if(this.experiencePoints >= this.nextLevelExperiencePoints) {
+            		this.level++;
+        	} break;
+        }
+    }*/
 };
+
+
 
 // level up the creature
 Creature.prototype.levelUp = function() {
-	this.level++;
+	
 
 	// extra level up effects here
 };

@@ -1,4 +1,11 @@
-var Gender = function() {
-	this.name = "Male";
-	this.modifiers = [];
+/*
+	Gender.js
+	---------
+
+	...
+*/
+
+var Gender = function(arguments) {
+	this.name = arguments.name;
+	this.modifiers = arguments.modifiers;
 };

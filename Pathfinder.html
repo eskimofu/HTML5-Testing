@@ -1,0 +1,58 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>Pathfinder</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+    <script src="js/pathfinder/ModifierType.js"></script>
+    <script src="js/pathfinder/RequirementType.js"></script>
+    <script src="js/pathfinder/Modifier.js"></script>
+    <script src="js/pathfinder/TargetType.js"></script>
+    <script src="js/pathfinder/TargetTypeRule.js"></script>
+
+    <!-- no dependencies -->
+    <script src="js/pathfinder/Alignment.js"></script>
+    <script src="js/pathfinder/Language.js"></script>
+    <script src="js/pathfinder/Size.js"></script>
+    <script src="js/pathfinder/Gender.js"></script>
+    <script src="js/pathfinder/Currency.js"></script>
+    <script src="js/pathfinder/Buff.js"></script>
+    <script src="js/pathfinder/Effect.js"></script>
+    <script src="js/pathfinder/HitDice.js"></script>
+    <script src="js/pathfinder/SpellSchool.js"></script>
+    
+
+    <!-- dependencies -->
+    <script src="js/pathfinder/Race.js"></script>
+    <script src="js/pathfinder/Class.js"></script>
+    <script src="js/pathfinder/Item.js"></script>
+    <script src="js/pathfinder/Spell.js"></script>
+
+    <script src="js/pathfinder/Creature.js"></script>
+    <script src="js/pathfinder/World.js"></script>
+    <script src="js/pathfinder/PathfinderLoader.js"></script>
+</head>
+<body>
+ 
+    <div class="container">
+
+        <script type="text/javascript">
+
+            var world = new World({name: "My World", ruleset: "Pathfinder"});
+            console.log("World loaded");
+
+        </script>
+
+    </div> <!-- /container -->
+
+</body>
+</html>

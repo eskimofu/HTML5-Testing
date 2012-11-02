@@ -1,6 +1,13 @@
+/*
+	Race.js
+	-------
+
+	...
+*/
+
 var Race = function(arguments) {
 	this.name = arguments.name;
 	this.size = arguments.size;
-	this.modifiers = [];
-	this.languages = [];
+	this.languages = arguments.languages;
+	this.modifiers = arguments.modifiers;
 };

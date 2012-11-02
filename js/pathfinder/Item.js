@@ -1,7 +1,17 @@
-var Item = function() {
-	this.name = "New Item";
-	this.type; // weapon, armour, food, ... armour_head, armour_face, weapon_1hand
-	this.numberOfUses = 1;
-	this.modifiers = [];
-	this.weight = 0;
+/*
+	Item.js
+	-------
+
+	...
+*/
+
+var Item = function(arguments) {
+	this.name = arguments.name;					// string, name of item 
+	this.itemCategory = arguments.itemCategory; 
+	this.uses = arguments.uses;
+	this.effect = arguments.effect;
+	this.weight = arguments.weight;
+	this.value = arguments.value;
+	this.targets = arguments.targets;
+	this.currentHP = arguments.hp;
 };
