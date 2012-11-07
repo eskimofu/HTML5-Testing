@@ -1,0 +1,1 @@
+png2ico/png2ico --colors 16 favicon.ico f16.png f32.png f128.png
